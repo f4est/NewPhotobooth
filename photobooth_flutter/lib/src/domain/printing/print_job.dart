@@ -3,6 +3,7 @@ class PrintJob {
     required this.filePath,
     required this.printerName,
     this.copies = 1,
+    this.silentPrint = true,
     this.paperName = '6 x 4 in',
     this.paperWidthInches = 6,
     this.paperHeightInches = 4,
@@ -20,6 +21,7 @@ class PrintJob {
   final String filePath;
   final String printerName;
   final int copies;
+  final bool silentPrint;
   final String paperName;
   final double paperWidthInches;
   final double paperHeightInches;

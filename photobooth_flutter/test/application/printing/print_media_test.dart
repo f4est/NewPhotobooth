@@ -16,6 +16,7 @@ void main() {
       settings: const PrintSettings(
         selectedPrinter: 'DNP RX1',
         printLimit: 2,
+        silentPrint: false,
         paperSize: PrintPaperSize.fourBySix,
         scaleMode: PrintScaleMode.fit,
         forceLandscape: true,
@@ -26,6 +27,7 @@ void main() {
     expect(repository.lastJob?.filePath, 'collage.jpg');
     expect(repository.lastJob?.printerName, 'DNP RX1');
     expect(repository.lastJob?.copies, 2);
+    expect(repository.lastJob?.silentPrint, isFalse);
     expect(repository.lastJob?.paperName, '4 x 6 in');
     expect(repository.lastJob?.paperWidthInches, 4);
     expect(repository.lastJob?.paperHeightInches, 6);

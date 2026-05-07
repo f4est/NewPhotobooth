@@ -26,6 +26,7 @@ class PrintImageFile {
         filePath: filePath,
         printerName: printerName,
         copies: settings.printLimit <= 0 ? 1 : settings.printLimit,
+        silentPrint: settings.silentPrint,
         paperName: settings.paperSize.label,
         paperWidthInches: settings.paperSize.widthInches,
         paperHeightInches: settings.paperSize.heightInches,

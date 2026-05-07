@@ -37,6 +37,21 @@ void main() {
     expect(script, isNot(contains('DefaultPageSettings.PaperSize')));
     expect(script, isNot(contains('DefaultPageSettings.Margins')));
   });
+
+  test('shows print dialog when silent printing is disabled', () {
+    const command = WindowsImagePrintCommand(
+      PrintJob(
+        filePath: r'C:\Events\collage.jpg',
+        printerName: 'DNP RX1',
+        silentPrint: false,
+      ),
+    );
+
+    final script = _decodeUtf16Le(base64Decode(command.arguments.last));
+
+    expect(script, contains('System.Windows.Forms.PrintDialog'));
+    expect(script, contains(r'$dialog.ShowDialog()'));
+  });
 }
 
 String _decodeUtf16Le(List<int> bytes) {

@@ -21,5 +21,5 @@
 ## Next
 - Add real video capture and GIF pipeline before exposing video/GIF controls.
 - Add green screen/background compositing before exposing green screen controls.
-- Add DSLR adapters behind the camera repository for Canon/Nikon/Sony SDKs.
+- Add DSLR adapters behind the camera repository for Canon/Nikon/Sony SDKs, then expose those camera types in Main Settings.
 - Add integration tests for booth start, print dispatch and sharing dispatch.

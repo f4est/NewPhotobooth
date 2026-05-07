@@ -312,16 +312,6 @@ class _CameraTypeField extends StatelessWidget {
           initialValue: settings.camera.type,
           items: const [
             DropdownMenuItem(value: CameraType.webcam, child: Text('Webcam')),
-            DropdownMenuItem(
-              value: CameraType.canonEdsdk,
-              child: Text('Canon DSLR USB'),
-            ),
-            DropdownMenuItem(
-              value: CameraType.canonCcapi,
-              child: Text('Canon CCAPI Wi-Fi'),
-            ),
-            DropdownMenuItem(value: CameraType.nikon, child: Text('Nikon')),
-            DropdownMenuItem(value: CameraType.sony, child: Text('Sony')),
           ],
           onChanged: (type) {
             if (type != null) {
@@ -330,6 +320,11 @@ class _CameraTypeField extends StatelessWidget {
               );
             }
           },
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'DSLR adapters are not active in this Flutter build yet. Webcam is the only enabled camera backend.',
+          style: TextStyle(fontSize: 12, color: Color(0xff64748b)),
         ),
       ],
     );

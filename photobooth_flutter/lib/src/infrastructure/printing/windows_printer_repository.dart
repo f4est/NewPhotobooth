@@ -105,6 +105,21 @@ class WindowsImagePrintCommand {
 \$doc.DefaultPageSettings.PaperSize = New-Object System.Drawing.Printing.PaperSize('${_ps(job.paperName)}', $paperWidth, $paperHeight)
 \$doc.DefaultPageSettings.Margins = New-Object System.Drawing.Printing.Margins($left, $right, $top, $bottom)
 ''';
+    final printDialogScript = job.silentPrint
+        ? ''
+        : '''
+Add-Type -AssemblyName System.Windows.Forms
+\$dialog = New-Object System.Windows.Forms.PrintDialog
+\$dialog.Document = \$doc
+\$dialog.AllowSomePages = \$false
+\$dialog.AllowSelection = \$false
+\$dialog.UseEXDialog = \$true
+\$dialogResult = \$dialog.ShowDialog()
+if (\$dialogResult -ne [System.Windows.Forms.DialogResult]::OK) {
+  \$doc.Dispose()
+  exit 0
+}
+''';
 
     return '''
 Add-Type -AssemblyName System.Drawing
@@ -113,6 +128,7 @@ Add-Type -AssemblyName System.Drawing
 \$doc = New-Object System.Drawing.Printing.PrintDocument
 \$doc.PrinterSettings.PrinterName = \$printerName
 $pageSettingsScript
+$printDialogScript
 \$doc.add_PrintPage({
   param(\$sender, \$e)
   \$img = [System.Drawing.Image]::FromFile(\$imagePath)
