@@ -1,0 +1,55 @@
+# Local reference apps, SDK dumps and screenshots.
+/AIPhotoBoothPro/
+/PhotoboothPro-main/
+/то что нужно для софта будок/
+/Интерфейс ActivationKing/
+
+# Flutter / Dart
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/build/
+**/coverage/
+**/windows/flutter/ephemeral/
+*.iml
+
+# Native build outputs
+**/bin/
+**/obj/
+**/.vs/
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+
+# Large/generated binaries and media
+*.exe
+*.dll
+*.pdb
+*.so
+*.dylib
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+*.7z
+*.rar
+*.iso
+
+# Local IDE and OS files
+.idea/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local runtime data
+*.log
+*.tmp
+*.bak
