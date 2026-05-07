@@ -480,6 +480,8 @@ class _GuestActions extends StatelessWidget {
   const _GuestActions({
     required this.state,
     required this.screenTexts,
+    required this.photoEnabled,
+    required this.galleryEnabled,
     required this.onPhoto,
     required this.onGallery,
     required this.onDone,
@@ -487,6 +489,8 @@ class _GuestActions extends StatelessWidget {
 
   final PhotoBoothState state;
   final ScreenTextSettings screenTexts;
+  final bool photoEnabled;
+  final bool galleryEnabled;
   final Future<void> Function() onPhoto;
   final VoidCallback onGallery;
   final VoidCallback onDone;
@@ -494,6 +498,7 @@ class _GuestActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final canStart =
+        photoEnabled &&
         !state.isRunningSequence &&
         !state.isCapturing &&
         !state.session.isComplete;
@@ -520,7 +525,9 @@ class _GuestActions extends StatelessWidget {
         const SizedBox(width: 10),
         IconButton.filledTonal(
           tooltip: screenTexts.text('gallery'),
-          onPressed: state.session.photos.isNotEmpty || state.collage != null
+          onPressed:
+              galleryEnabled &&
+                  (state.session.photos.isNotEmpty || state.collage != null)
               ? onGallery
               : null,
           icon: const Icon(Icons.photo_library_outlined),
@@ -647,6 +654,8 @@ class _SessionPanel extends StatelessWidget {
     final screenTexts =
         settingsController?.value.settings.screenTexts ??
         const ScreenTextSettings();
+    final shootingSettings =
+        settingsController?.value.settings.shooting ?? const ShootingSettings();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -661,6 +670,8 @@ class _SessionPanel extends StatelessWidget {
         _GuestActions(
           state: state,
           screenTexts: screenTexts,
+          photoEnabled: shootingSettings.photoEnabled,
+          galleryEnabled: shootingSettings.galleryEnabled,
           onPhoto: () async {
             await onStartSequence();
             await onAutoPrepareResult?.call();
@@ -668,6 +679,16 @@ class _SessionPanel extends StatelessWidget {
           onGallery: () => _showSessionGallery(context, state, screenTexts),
           onDone: onDone,
         ),
+        if (!shootingSettings.photoEnabled)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(screenTexts.text('photoDisabled')),
+          ),
+        if (!shootingSettings.galleryEnabled)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(screenTexts.text('galleryDisabled')),
+          ),
         if (state.isBuildingCollage) ...[
           const SizedBox(height: 12),
           ListTile(

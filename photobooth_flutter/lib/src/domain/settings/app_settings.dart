@@ -373,10 +373,12 @@ class ScreenTextSettings {
 
   static const defaultValues = <String, String>{
     'photo': 'Photo',
+    'photoDisabled': 'Photo capture is disabled in Main Settings.',
     'video': 'Video',
     'done': 'Done',
     'cancel': 'Cancel',
     'gallery': 'Gallery',
+    'galleryDisabled': 'Gallery is disabled in Main Settings.',
     'print': 'Print',
     'close': 'Close',
     'email': 'E-mail',
