@@ -18,6 +18,7 @@ import '../application/sharing/send_media_email.dart';
 import '../application/sharing/send_media_sms.dart';
 import '../application/sharing/send_test_email.dart';
 import '../application/sharing/send_test_sms.dart';
+import '../application/sharing/save_media_to_pc.dart';
 import '../application/system/apply_startup_preference.dart';
 import '../application/templates/load_templates.dart';
 import '../application/templates/save_templates.dart';
@@ -115,6 +116,7 @@ AppDependencies buildProductionDependencies() {
     sendMediaEmail: const SendMediaEmail(sender: MailerEmailSender()),
     sendMediaSms: SendMediaSms(sender: TwilioSmsSender()),
     sendTestSms: SendTestSms(sender: TwilioSmsSender()),
+    saveMediaToPc: const SaveMediaToPc(),
   );
   final cameraDiscoveryController = CameraDiscoveryController(
     listCameraDevices: ListCameraDevices(

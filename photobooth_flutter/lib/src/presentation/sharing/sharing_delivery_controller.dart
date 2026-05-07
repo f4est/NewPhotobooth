@@ -4,6 +4,7 @@ import '../../application/sharing/send_media_email.dart';
 import '../../application/sharing/send_media_sms.dart';
 import '../../application/sharing/send_test_email.dart';
 import '../../application/sharing/send_test_sms.dart';
+import '../../application/sharing/save_media_to_pc.dart';
 import '../../domain/settings/app_settings.dart';
 
 class SharingDeliveryState {
@@ -11,6 +12,7 @@ class SharingDeliveryState {
     this.isSendingMail = false,
     this.isSendingMedia = false,
     this.isSendingSms = false,
+    this.isSavingMedia = false,
     this.message,
     this.errorMessage,
   });
@@ -18,6 +20,7 @@ class SharingDeliveryState {
   final bool isSendingMail;
   final bool isSendingMedia;
   final bool isSendingSms;
+  final bool isSavingMedia;
   final String? message;
   final String? errorMessage;
 
@@ -25,6 +28,7 @@ class SharingDeliveryState {
     bool? isSendingMail,
     bool? isSendingMedia,
     bool? isSendingSms,
+    bool? isSavingMedia,
     String? message,
     String? errorMessage,
   }) {
@@ -32,6 +36,7 @@ class SharingDeliveryState {
       isSendingMail: isSendingMail ?? this.isSendingMail,
       isSendingMedia: isSendingMedia ?? this.isSendingMedia,
       isSendingSms: isSendingSms ?? this.isSendingSms,
+      isSavingMedia: isSavingMedia ?? this.isSavingMedia,
       message: message,
       errorMessage: errorMessage,
     );
@@ -44,16 +49,19 @@ class SharingDeliveryController extends ValueNotifier<SharingDeliveryState> {
     required SendMediaEmail sendMediaEmail,
     required SendMediaSms sendMediaSms,
     required SendTestSms sendTestSms,
+    required SaveMediaToPc saveMediaToPc,
   }) : _sendTestEmail = sendTestEmail,
        _sendMediaEmail = sendMediaEmail,
        _sendMediaSms = sendMediaSms,
        _sendTestSms = sendTestSms,
+       _saveMediaToPc = saveMediaToPc,
        super(const SharingDeliveryState());
 
   final SendTestEmail _sendTestEmail;
   final SendMediaEmail _sendMediaEmail;
   final SendMediaSms _sendMediaSms;
   final SendTestSms _sendTestSms;
+  final SaveMediaToPc _saveMediaToPc;
 
   Future<void> sendTestEmail(SharingSettings settings) async {
     if (value.isSendingMail) {
@@ -127,6 +135,28 @@ class SharingDeliveryController extends ValueNotifier<SharingDeliveryState> {
       return true;
     } catch (error) {
       value = SharingDeliveryState(errorMessage: 'SMS failed: $error');
+      return false;
+    }
+  }
+
+  Future<bool> saveMediaToPc({
+    required String sourcePath,
+    required String destinationPath,
+  }) async {
+    if (value.isSavingMedia) {
+      return false;
+    }
+
+    value = value.copyWith(isSavingMedia: true);
+    try {
+      final savedPath = await _saveMediaToPc(
+        sourcePath: sourcePath,
+        destinationPath: destinationPath,
+      );
+      value = SharingDeliveryState(message: 'Media saved: $savedPath');
+      return true;
+    } catch (error) {
+      value = SharingDeliveryState(errorMessage: 'Save failed: $error');
       return false;
     }
   }

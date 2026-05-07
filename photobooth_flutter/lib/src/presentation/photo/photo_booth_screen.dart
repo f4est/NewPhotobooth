@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/photo/captured_photo.dart';
@@ -982,6 +983,52 @@ class _DeliveryActionsState extends State<_DeliveryActions> {
                     : widget.screenTexts.text('emailCollage'),
               ),
             ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed:
+                  sharingSettings.saveToPcEnabled &&
+                      !deliveryState.isSavingMedia
+                  ? () async {
+                      final sourcePath = widget.state.collage!.filePath;
+                      final location = await getSaveLocation(
+                        suggestedName: File(sourcePath).uri.pathSegments.last,
+                        acceptedTypeGroups: const [
+                          XTypeGroup(
+                            label: 'Images',
+                            extensions: ['jpg', 'jpeg', 'png'],
+                          ),
+                        ],
+                      );
+                      if (location == null) {
+                        return;
+                      }
+                      final saved = await widget.sharingDeliveryController
+                          .saveMediaToPc(
+                            sourcePath: sourcePath,
+                            destinationPath: location.path,
+                          );
+                      if (saved) {
+                        await widget.onMediaShared?.call();
+                      }
+                    }
+                  : null,
+              icon: deliveryState.isSavingMedia
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.save_alt_outlined),
+              label: Text(
+                deliveryState.isSavingMedia
+                    ? widget.screenTexts.text('savingFile')
+                    : widget.screenTexts.text('saveAs'),
+              ),
+            ),
+            if (!sharingSettings.saveToPcEnabled)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(widget.screenTexts.text('saveToPcDisabled')),
+              ),
             const SizedBox(height: 8),
             if (sharingSettings.smsEnabled) ...[
               _GuestDeliveryField(
