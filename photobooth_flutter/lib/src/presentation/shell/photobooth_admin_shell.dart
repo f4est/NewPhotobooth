@@ -150,6 +150,7 @@ class _PhotoboothAdminShellState extends State<PhotoboothAdminShell> {
       AdminSection.print => PrintSettingsPage(
         controller: widget.settingsController,
         printerController: widget.printerController,
+        mediaPrintController: widget.mediaPrintController,
       ),
       AdminSection.gallery => GalleryPage(
         controller: widget.mediaGalleryController,

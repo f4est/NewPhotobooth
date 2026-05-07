@@ -9,6 +9,7 @@ import '../application/photo/capture_photo.dart';
 import '../application/printing/list_printers.dart';
 import '../application/printing/print_image_file.dart';
 import '../application/printing/print_media.dart';
+import '../application/printing/print_test_page.dart';
 import '../application/settings/load_settings.dart';
 import '../application/settings/save_settings.dart';
 import '../application/sharing/create_download_link.dart';
@@ -87,6 +88,7 @@ AppDependencies buildProductionDependencies() {
   final mediaPrintController = MediaPrintController(
     printMedia: PrintMedia(repository: WindowsPrinterRepository()),
     printImageFile: PrintImageFile(repository: WindowsPrinterRepository()),
+    printTestPage: PrintTestPage(repository: WindowsPrinterRepository()),
   );
   final eventController = EventController(
     loadEvents: LoadEvents(repository: eventRepository),

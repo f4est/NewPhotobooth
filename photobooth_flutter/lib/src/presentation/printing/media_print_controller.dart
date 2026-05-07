@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../application/printing/print_image_file.dart';
 import '../../application/printing/print_media.dart';
+import '../../application/printing/print_test_page.dart';
 import '../../domain/photo/photo_collage.dart';
 import '../../domain/settings/app_settings.dart';
 
@@ -37,13 +38,15 @@ class MediaPrintController extends ValueNotifier<MediaPrintState> {
   MediaPrintController({
     required PrintMedia printMedia,
     required PrintImageFile printImageFile,
-  })
-    : _printMedia = printMedia,
-      _printImageFile = printImageFile,
-      super(const MediaPrintState());
+    required PrintTestPage printTestPage,
+  }) : _printMedia = printMedia,
+       _printImageFile = printImageFile,
+       _printTestPage = printTestPage,
+       super(const MediaPrintState());
 
   final PrintMedia _printMedia;
   final PrintImageFile _printImageFile;
+  final PrintTestPage _printTestPage;
 
   Future<bool> printCollage({
     required PhotoCollage collage,
@@ -94,6 +97,30 @@ class MediaPrintController extends ValueNotifier<MediaPrintState> {
       value = value.copyWith(
         isPrinting: false,
         errorMessage: 'Print failed: $error',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> printTestPage({required PrintSettings settings}) async {
+    if (value.isPrinting) {
+      return false;
+    }
+
+    value = value.copyWith(isPrinting: true);
+
+    try {
+      final filePath = await _printTestPage(settings: settings);
+      value = value.copyWith(
+        isPrinting: false,
+        printedCount: value.printedCount + 1,
+        message: 'Test page sent to printer: $filePath',
+      );
+      return true;
+    } catch (error) {
+      value = value.copyWith(
+        isPrinting: false,
+        errorMessage: 'Test print failed: $error',
       );
       return false;
     }

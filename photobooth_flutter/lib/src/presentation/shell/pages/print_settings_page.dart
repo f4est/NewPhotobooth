@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../domain/settings/app_settings.dart';
+import '../../printing/media_print_controller.dart';
 import '../../printing/printer_controller.dart';
 import '../../settings/settings_controller.dart';
 import '../shell_chrome.dart';
@@ -9,11 +10,13 @@ class PrintSettingsPage extends StatelessWidget {
   const PrintSettingsPage({
     required this.controller,
     required this.printerController,
+    required this.mediaPrintController,
     super.key,
   });
 
   final SettingsController controller;
   final PrinterController printerController;
+  final MediaPrintController mediaPrintController;
 
   @override
   Widget build(BuildContext context) {
@@ -86,93 +89,139 @@ class PrintSettingsPage extends StatelessWidget {
                 ],
               ),
             ),
-            AdminPanel(
-              title: 'Printer',
-              child: SizedBox(
-                height: 460,
-                child: Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            ValueListenableBuilder<MediaPrintState>(
+              valueListenable: mediaPrintController,
+              builder: (context, printState, _) {
+                return AdminPanel(
+                  title: 'Printer',
+                  child: SizedBox(
+                    height: 500,
+                    child: Column(
                       children: [
-                        SizedBox(
-                          width: 360,
-                          child: _PrinterSelector(
-                            selectedPrinter: print.selectedPrinter,
-                            printerController: printerController,
-                            onChanged: (printer) => _update(
-                              settings,
-                              print.copyWith(selectedPrinter: printer ?? ''),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 360,
+                              child: _PrinterSelector(
+                                selectedPrinter: print.selectedPrinter,
+                                printerController: printerController,
+                                onChanged: (printer) => _update(
+                                  settings,
+                                  print.copyWith(
+                                    selectedPrinter: printer ?? '',
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 48),
-                        SizedBox(
-                          width: 180,
-                          child: _PaperSizeSelector(
-                            paperSize: print.paperSize,
-                            onChanged: (paperSize) => _update(
-                              settings,
-                              print.copyWith(paperSize: paperSize),
+                            const SizedBox(width: 48),
+                            SizedBox(
+                              width: 180,
+                              child: _PaperSizeSelector(
+                                paperSize: print.paperSize,
+                                onChanged: (paperSize) => _update(
+                                  settings,
+                                  print.copyWith(paperSize: paperSize),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 18),
-                        SizedBox(
-                          width: 150,
-                          child: _ScaleModeSelector(
-                            scaleMode: print.scaleMode,
-                            onChanged: (scaleMode) => _update(
-                              settings,
-                              print.copyWith(scaleMode: scaleMode),
+                            const SizedBox(width: 18),
+                            SizedBox(
+                              width: 150,
+                              child: _ScaleModeSelector(
+                                scaleMode: print.scaleMode,
+                                onChanged: (scaleMode) => _update(
+                                  settings,
+                                  print.copyWith(scaleMode: scaleMode),
+                                ),
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 18),
+                            SizedBox(
+                              width: 100,
+                              child: _Field(
+                                label: 'Print Limit',
+                                value: print.printLimit.toString(),
+                                keyboardType: TextInputType.number,
+                                onChanged: (value) => _update(
+                                  settings,
+                                  print.copyWith(
+                                    printLimit:
+                                        int.tryParse(value) ?? print.printLimit,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            OutlinedButton.icon(
+                              onPressed: printerController.refresh,
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Refresh'),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton.icon(
+                              onPressed:
+                                  printState.isPrinting ||
+                                      !print.enabled ||
+                                      print.selectedPrinter.trim().isEmpty
+                                  ? null
+                                  : () => mediaPrintController.printTestPage(
+                                      settings: print,
+                                    ),
+                              icon: printState.isPrinting
+                                  ? const SizedBox.square(
+                                      dimension: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.fact_check_outlined),
+                              label: const Text('Test Print'),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 18),
-                        SizedBox(
-                          width: 100,
-                          child: _Field(
-                            label: 'Print Limit',
-                            value: print.printLimit.toString(),
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) => _update(
-                              settings,
-                              print.copyWith(
-                                printLimit:
-                                    int.tryParse(value) ?? print.printLimit,
+                        if (printState.message != null) ...[
+                          const SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(printState.message!),
+                          ),
+                        ],
+                        if (printState.errorMessage != null) ...[
+                          const SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              printState.errorMessage!,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
                               ),
                             ),
                           ),
+                        ],
+                        const SizedBox(height: 18),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Selected size: ${print.paperSize.label} (${print.paperSize.widthInches.toStringAsFixed(2)} x ${print.paperSize.heightInches.toStringAsFixed(2)} in). Direct Print sends the image immediately to the selected printer without a dialog.',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                            ),
+                          ),
                         ),
-                        const Spacer(),
-                        OutlinedButton.icon(
-                          onPressed: printerController.refresh,
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Refresh'),
+                        const SizedBox(height: 18),
+                        Expanded(
+                          child: _PrintOffsetEditor(
+                            settings: settings,
+                            controller: controller,
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 28),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Selected size: ${print.paperSize.label} (${print.paperSize.widthInches.toStringAsFixed(2)} x ${print.paperSize.heightInches.toStringAsFixed(2)} in). Direct Print sends the image immediately to the selected printer without a dialog.',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Expanded(
-                      child: _PrintOffsetEditor(
-                        settings: settings,
-                        controller: controller,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ],
         );
